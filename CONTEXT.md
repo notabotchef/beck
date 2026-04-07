@@ -185,4 +185,65 @@ This also aligns with Esteban's standing values:
 - Reusable across the whole agent fleet
 - Mise en place: prep before execution
 
+---
+
+## 9. The real stakes (added 2026-04-07, late session)
+
+Mid-conversation Esteban revealed this is not a personal tool. The vision
+is bigger and the clock is real:
+
+- skilr is meant to be an **open-source viral launch**
+- Target: become the **industry standard for how agents load and share
+  skills** — the "MCP for skills" / context-engineering toolkit for agents
+- Personal stakes: Esteban has been jobless since **December 31st, 2025**.
+  skilr is the bet that validates the time he has spent building instead
+  of going back to 16-hour kitchen shifts
+- Motivation framing (from Esteban): "What if this changes the way any
+  agent uses skills and becomes a standard? That is what I am trying to
+  build here."
+
+This changes the scope. skilr is no longer a weekend Python script. It is
+a product launch that has to look inevitable on day one — the way `uv`,
+`ripgrep`, `zoxide`, `bat`, and `httpie` looked inevitable the moment the
+world saw them.
+
+### Implications
+
+1. **Language reconsidered.** Python MVP is still valid for speed, but the
+   viral OSS reference class (uv, ripgrep, zoxide, fd, bat) is almost
+   entirely native Rust binaries installable via `brew` / `cargo install`
+   / `curl | sh`. Rust is now the leading candidate for the shipped v1.
+   Python stays as a possible prototype-only path.
+
+2. **Planning discipline raised.** Before any code is written, skilr runs
+   the front half of gstack:
+   - `/office-hours` — vision, 10x version, naming, launch-day picture
+   - `/plan-ceo-review` — find the 10-star product hiding in the 3-star
+     version; lock the pitch and positioning
+   - `/plan-eng-review` — stress-test HANDOFF.md architecture, edge cases,
+     security (malicious SKILL.md), cross-platform (Linux/macOS/Windows)
+   Skipped for now: `/design-review`, `/qa`, `/ship` (too early).
+
+3. **Launch surface must be planned, not discovered.**
+   - One-sentence pitch (must be crystal clear)
+   - README with GIF in first 10 seconds
+   - One-line install (`brew install skilr` ideally)
+   - Works for strangers on day one, not just Esteban's machine
+   - Comparison table vs current "inject everything" baseline
+   - Hard benchmarks: tokens saved, query latency, sync time
+   - Launch plan: Hacker News (Show HN), r/LocalLLaMA, X dev community,
+     Anthropic + OpenAI developer channels, MCP community
+
+4. **Rule of discipline (Esteban's own frame).** Build skilr from
+   conviction, not from fear of the kitchen. Fear rushes. Conviction
+   finishes. This is opening night at a 3-Michelin-star — plan like it.
+
+### Decision queued for tomorrow morning
+
+Before writing code, run gstack front-half in Hermes using the
+`run-gstack-skill` skill. Produce durable artifacts in
+`~/.gstack/projects/skilr/` so nothing is lost across sessions. Only after
+`/office-hours` + `/plan-ceo-review` + `/plan-eng-review` land does the
+first commit of actual skilr code get written.
+
 End of context.

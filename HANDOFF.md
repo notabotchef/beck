@@ -4,7 +4,13 @@
 Author: Hermes (Engineer persona)
 For: Esteban Nunez / next implementing agent
 Date: 2026-04-07
-Status: SPEC — ready to implement
+Status: SPEC — DO NOT IMPLEMENT YET. Blocked on gstack front-half
+(office-hours → plan-ceo-review → plan-eng-review). See CONTEXT.md §9.
+
+Mission framing: skilr is an open-source viral launch targeting the
+agent-tooling ecosystem. Goal is to become the standard for how agents
+load and share skills. Treat every decision as "will this look inevitable
+on day one of the Show HN post?"
 
 ---
 
@@ -255,8 +261,12 @@ enabled = true
 ## 11. Open questions for Esteban
 
 1. Preferred language: Python (fastest to ship, heavier) or Rust (true native
-   binary, longer to build)? Recommendation: **Python MVP now, Rust port later
-   if worth it**.
+   binary, longer to build)? **UPDATED 2026-04-07:** skilr is now scoped as a
+   viral OSS launch. Reference class (uv, ripgrep, zoxide, fd, bat) is almost
+   entirely native Rust distributed via `brew` / `cargo install` / `curl | sh`.
+   **Leading recommendation: Rust for shipped v1.** Python only as a throwaway
+   prototype if speed-to-first-demo matters more than launch polish. Final
+   call happens during `/office-hours` + `/plan-eng-review` tomorrow.
 2. Should skilr ALSO index non-skill docs (CLAUDE.md, DESIGN_TOKENS.md,
    CONTRIBUTING.md)? That would let the agent pull project context on demand
    the same way. Recommendation: **yes, as a separate collection in v2**.
@@ -267,13 +277,36 @@ enabled = true
 
 ## 12. Next action
 
-Spawn an implementing agent with this handoff. Suggested prompt:
+**BLOCKED on gstack front-half.** Do not spawn an implementing agent yet.
 
-> Read ~/Projects/skilr/HANDOFF.md. Implement Phase 0-2 end to end in Python
-> on a new git branch `feat/skilr-mvp`. Use fastembed + SQLite FTS5. Ship
-> `sync`, `list`, `query`, `load`, `status`. Write a minimal README and a
+Tomorrow morning, in a fresh Hermes session, run the `run-gstack-skill`
+skill to execute these three phases in order. Save all artifacts to
+`~/.gstack/projects/skilr/`:
+
+1. `/office-hours` — lock the vision, 10x version, name, tagline,
+   launch-day picture. Answers: who is this for, what does "done" mean,
+   what does day-1-of-launch look like.
+2. `/plan-ceo-review` — find the 10-star product hiding in the 3-star
+   version. Lock the pitch, positioning, and comparison frame (vs current
+   "inject everything" baseline). Produce the one-sentence pitch.
+3. `/plan-eng-review` — stress-test this HANDOFF.md. Cover:
+   - Rust vs Python final call
+   - Malicious SKILL.md / prompt-injection surface
+   - Cross-platform (macOS, Linux, Windows)
+   - Install story (`brew`, `cargo install`, `curl | sh`, `pipx`)
+   - Benchmarks plan (tokens saved, query latency, sync time)
+   - SKILL.md format compatibility (Hermes, Claude Code, gstack)
+
+Only after those three land does the first commit of actual skilr code
+get written. Suggested post-planning prompt to the implementing agent:
+
+> Read ~/Projects/skilr/CONTEXT.md and HANDOFF.md and all artifacts under
+> ~/.gstack/projects/skilr/. Implement Phase 0-2 on branch `feat/skilr-mvp`
+> in the language chosen during /plan-eng-review. Ship `sync`, `list`,
+> `query`, `load`, `status`. Include README with GIF placeholder, install
+> instructions, comparison table vs "inject everything" baseline, and a
 > tests/ folder with 10 sample SKILL.md fixtures. Report back with install
-> steps and a recorded demo of `skilr query "deploy frontend"` returning the
-> right skill.
+> steps and a recorded demo of `skilr query "deploy frontend"` returning
+> the right skill.
 
 End of handoff.
