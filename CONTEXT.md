@@ -1,6 +1,14 @@
-# skilr — Conversation Context & Origin Story
+# beck — Conversation Context & Origin Story
 
-This file captures the conversation and research that led to the `skilr`
+> **RENAME NOTICE (2026-04-07):** This project was originally named `skilr`.
+> It was renamed to `beck` during `/plan-ceo-review` after a research pass
+> confirmed `beck` is dual-clear on crates.io + homebrew-core and the English
+> idiom "at your beck and call" literally describes the product: skills
+> summoned on demand. All documents below have been updated to reference
+> `beck`. Git history preserves the original `skilr` commits.
+
+
+This file captures the conversation and research that led to the `beck`
 project, so any future agent (or Esteban months from now) can be fully
 caught up by reading just `CONTEXT.md` + `HANDOFF.md`.
 
@@ -108,7 +116,7 @@ This is the canonical design. It matches what Anthropic and OpenAI shipped
 at the API level, but as a local-first, agent-agnostic CLI that works
 across Hermes, Claude Code, Codex, and any shell-capable agent.
 
-Name chosen: **skilr** (Skills Router).
+Name initially chosen: **skilr** (Skills Router). Renamed to **beck** on 2026-04-07 during /plan-ceo-review after research found that "at your beck and call" literally describes the product.
 
 ---
 
@@ -121,7 +129,7 @@ Name chosen: **skilr** (Skills Router).
 | Embedder | `BAAI/bge-small-en-v1.5` via fastembed | ~130MB, CPU-only, ~30ms per query, no API keys |
 | Search | Hybrid: FTS5 BM25 top-20 → cosine rerank → top-K | Beats pure vector on short queries, nearly free on CPU |
 | Skill format | Existing SKILL.md + YAML frontmatter | Already used by Hermes, Claude Code, gstack |
-| Scope | Index, find, serve. NOT execute. | Agent runs the skill; skilr only stores and serves |
+| Scope | Index, find, serve. NOT execute. | Agent runs the skill; beck only stores and serves |
 | Network | Zero runtime network calls | Local-first, period |
 
 ---
@@ -132,7 +140,7 @@ Name chosen: **skilr** (Skills Router).
    yes, as a separate collection in v2.
 2. Telemetry — local JSONL log of query→load pairs to measure hit rate?
    Recommendation: yes, opt-in, local only.
-3. Auto-sync via file watcher or just on-demand `skilr sync`? Recommendation:
+3. Auto-sync via file watcher or just on-demand `beck sync`? Recommendation:
    on-demand for MVP, watcher in v2.
 
 ---
@@ -140,14 +148,14 @@ Name chosen: **skilr** (Skills Router).
 ## 6. What lives where
 
 ```
-~/Projects/skilr/
+~/Projects/beck/
   CONTEXT.md     ← this file (origin story + research)
   HANDOFF.md     ← full implementation spec
   (future)       ← src/, tests/, pyproject.toml, README.md
 ```
 
-Code repo: `~/Projects/skilr/` (git initialized in this session)
-Hermes session transcript: searchable via `session_search "skilr"` or
+Code repo: `~/Projects/beck/` (git initialized in this session)
+Hermes session transcript: searchable via `session_search "beck"` or
 `session_search "skill router lazy loading"` in any future Hermes session.
 
 ---
@@ -157,7 +165,7 @@ Hermes session transcript: searchable via `session_search "skilr"` or
 In any future agent session:
 
 ```
-cd ~/Projects/skilr
+cd ~/Projects/beck
 cat CONTEXT.md HANDOFF.md
 git log --oneline
 ```
@@ -167,7 +175,7 @@ That gives full context in <2 minutes. From there:
 - To start building MVP: follow Phase 0-2 in HANDOFF.md
 - To answer open questions: see section 5 above
 - To recall the exact conversation: in Hermes, run
-  `session_search "skilr token diet skill router"`
+  `session_search "beck token diet skill router"`
 
 ---
 
@@ -176,7 +184,7 @@ That gives full context in <2 minutes. From there:
 Esteban is building CarabinerOS — an AI-native restaurant management
 platform — with multiple agents (Hermes, Claude Code, Codex, Paperclip
 CEO/CTO/Engineer). Every one of those agents currently pays the same
-context tax on boot. skilr fixes the tax for all of them at once with a
+context tax on boot. beck fixes the tax for all of them at once with a
 single shared local CLI. It is infrastructure, not a feature.
 
 This also aligns with Esteban's standing values:
@@ -192,17 +200,17 @@ This also aligns with Esteban's standing values:
 Mid-conversation Esteban revealed this is not a personal tool. The vision
 is bigger and the clock is real:
 
-- skilr is meant to be an **open-source viral launch**
+- beck is meant to be an **open-source viral launch**
 - Target: become the **industry standard for how agents load and share
   skills** — the "MCP for skills" / context-engineering toolkit for agents
 - Personal stakes: Esteban has been jobless since **December 31st, 2025**.
-  skilr is the bet that validates the time he has spent building instead
+  beck is the bet that validates the time he has spent building instead
   of going back to 16-hour kitchen shifts
 - Motivation framing (from Esteban): "What if this changes the way any
   agent uses skills and becomes a standard? That is what I am trying to
   build here."
 
-This changes the scope. skilr is no longer a weekend Python script. It is
+This changes the scope. beck is no longer a weekend Python script. It is
 a product launch that has to look inevitable on day one — the way `uv`,
 `ripgrep`, `zoxide`, `bat`, and `httpie` looked inevitable the moment the
 world saw them.
@@ -215,7 +223,7 @@ world saw them.
    / `curl | sh`. Rust is now the leading candidate for the shipped v1.
    Python stays as a possible prototype-only path.
 
-2. **Planning discipline raised.** Before any code is written, skilr runs
+2. **Planning discipline raised.** Before any code is written, beck runs
    the front half of gstack:
    - `/office-hours` — vision, 10x version, naming, launch-day picture
    - `/plan-ceo-review` — find the 10-star product hiding in the 3-star
@@ -227,14 +235,14 @@ world saw them.
 3. **Launch surface must be planned, not discovered.**
    - One-sentence pitch (must be crystal clear)
    - README with GIF in first 10 seconds
-   - One-line install (`brew install skilr` ideally)
+   - One-line install (`brew install beck` ideally)
    - Works for strangers on day one, not just Esteban's machine
    - Comparison table vs current "inject everything" baseline
    - Hard benchmarks: tokens saved, query latency, sync time
    - Launch plan: Hacker News (Show HN), r/LocalLLaMA, X dev community,
      Anthropic + OpenAI developer channels, MCP community
 
-4. **Rule of discipline (Esteban's own frame).** Build skilr from
+4. **Rule of discipline (Esteban's own frame).** Build beck from
    conviction, not from fear of the kitchen. Fear rushes. Conviction
    finishes. This is opening night at a 3-Michelin-star — plan like it.
 
@@ -242,8 +250,8 @@ world saw them.
 
 Before writing code, run gstack front-half in Hermes using the
 `run-gstack-skill` skill. Produce durable artifacts in
-`~/.gstack/projects/skilr/` so nothing is lost across sessions. Only after
+`~/.gstack/projects/beck/` so nothing is lost across sessions. Only after
 `/office-hours` + `/plan-ceo-review` + `/plan-eng-review` land does the
-first commit of actual skilr code get written.
+first commit of actual beck code get written.
 
 End of context.
