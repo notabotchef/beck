@@ -1,0 +1,101 @@
+//! beck - local skills router CLI for AI agents.
+//!
+//! Phase 1 of the v0 build. Seven commands. Single binary. MCP server stubs
+//! through to Phase 4. Layout follows mateonunez/nucleo: flat `src/`, typed
+//! CliError, clap derive tree, tokio::main async dispatch. Shared modules
+//! live in src/lib.rs so the `eval` harness can reuse them.
+
+use clap::{Parser, Subcommand};
+
+use beck::error::{CliError, print_error_json};
+
+mod commands;
+
+#[derive(Parser, Debug)]
+#[command(
+    name = "beck",
+    version,
+    about = "Your agent's skills, at its beck and call.",
+    long_about = "beck indexes SKILL.md files on disk and serves the right one on demand, so agents stop burning tokens on skill metadata in their system prompts.",
+    arg_required_else_help = true
+)]
+struct Cli {
+    #[command(subcommand)]
+    command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+enum Command {
+    /// Walk configured roots, index every SKILL.md into the local database.
+    Sync {
+        /// Force a full rebuild even if nothing appears to have changed.
+        #[arg(long)]
+        force: bool,
+        /// Emit JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// List every indexed skill.
+    List {
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Search indexed skills by free-text query.
+    Query {
+        /// Free-text search query.
+        text: String,
+        /// Number of results to return.
+        #[arg(long, default_value_t = 3)]
+        top: usize,
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Print the full body of a skill by name.
+    Load {
+        /// Exact skill name (use `beck list` to discover names).
+        name: String,
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Print the agent integration stub to paste into a system prompt.
+    Prompt {
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Estimate how many tokens beck saves you per agent turn.
+    Bench {
+        /// Show the math behind the number.
+        #[arg(long)]
+        explain: bool,
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Start the MCP server on stdio.
+    Mcp,
+}
+
+#[tokio::main]
+async fn main() {
+    let cli = Cli::parse();
+
+    let result: Result<(), CliError> = match cli.command {
+        Command::Sync { force, json } => commands::sync::handle(force, json).await,
+        Command::List { json } => commands::list::handle(json).await,
+        Command::Query { text, top, json } => commands::query::handle(&text, top, json).await,
+        Command::Load { name, json } => commands::load::handle(&name, json).await,
+        Command::Prompt { json } => commands::prompt::handle(json).await,
+        Command::Bench { explain, json } => commands::bench::handle(explain, json).await,
+        Command::Mcp => commands::mcp::handle().await,
+    };
+
+    if let Err(err) = result {
+        print_error_json(&err);
+        std::process::exit(err.exit_code());
+    }
+}

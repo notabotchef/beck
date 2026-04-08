@@ -7,7 +7,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use beck_core::{db::Db, query::search, sync::sync_root};
+use beck::{db::Db, query::search, sync::sync_root};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
