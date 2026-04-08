@@ -149,18 +149,25 @@ whether to ship at all.
 Mateonunez/nucleo uses `dirs` instead of `directories`. Simpler, fewer
 indirections, same API surface for our needs. Adopted in Phase 1.
 
-### CLAUDE.md / CONTEXT.md namespace cleanup
+### Namespace cleanup (DONE 2026-04-08)
 
-Both files still reference `github.com/estebannunez/beck` in several
-places. The real public URL is `gitlab.com/knifecode/beck` (GitHub is
-invisible to the public due to the Nunezchef account flag). Not urgent.
-Fix in a single grep-and-replace session before launch week.
+CLAUDE.md and CONTEXT.md were verified clean. STATUS.md and HANDOFF.md
+had stale `Nunezchef` and `estebannunez/beck` URLs; both updated to
+`notabotchef/beck` in this session. The canonical repo URL is now
+`https://github.com/notabotchef/beck` (with `gitlab.com/knifecode/beck`
+as a private backup).
 
-### github-flagged-account-recovery
+### Nunezchef account (DISCARDED 2026-04-08)
 
-The fixture corpus at `tests/fixtures/skills/github-flagged-account-recovery/`
-contains the exact playbook. Run it in a separate session before v0.1.0
-launch so that the "publish to crates.io yourself" path is unblocked for
-future releases. Blocked today; not blocking Phase 1.
+The shadowbanned `Nunezchef` GitHub account has been removed entirely:
+`Nunezchef/beck` repo deleted via web UI, account removed from local
+`gh` CLI via `gh auth logout -h github.com -u Nunezchef`. Every
+canonical URL now points at `notabotchef/beck`. The
+`github-flagged-account-recovery` fixture at
+`tests/fixtures/skills/github-flagged-account-recovery/` is still in
+the corpus because it is a real SKILL.md Esteban uses, but the
+recovery itself is no longer on beck's path; recovery of the original
+`estebannunez` GitHub account is out of scope and can happen later if
+ever needed.
 
 End of TODOS.
