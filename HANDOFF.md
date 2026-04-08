@@ -155,13 +155,13 @@ After Phase 2, eval gate runs against the real implementation. Must still pass t
 2. scripts/install.sh: detect OS+arch, download release tarball, verify sha256, install to /usr/local/bin or ~/.local/bin.
 3. .github/workflows/ci.yml: 5-cell matrix (ubuntu-22.04 gnu, ubuntu-latest musl, ubuntu-latest aarch64-gnu, macos-13 x86_64, macos-latest aarch64). cargo build --release, cargo test, strip + size gate. Separate jobs for cargo deny + fmt/clippy.
 4. .github/workflows/release.yml: on tag v*, build all 5, sign SHA256SUMS, gh release create, cargo publish.
-5. Homebrew tap repo at estebannunez/homebrew-beck with Formula/beck.rb (template in plan-eng-review section 10).
+5. Homebrew tap repo at notabotchef/homebrew-beck with Formula/beck.rb (template in plan-eng-review section 10).
 
 ### Phase 6 — Launch prep (DAY 7)
 
 1. Tag v0.1.0, push, watch release.yml.
 2. Verify cargo install beck on a clean machine.
-3. Verify brew tap estebannunez/beck && brew install beck.
+3. Verify brew tap notabotchef/beck && brew install beck.
 4. Verify curl install.
 5. Hand back to main agent for Show HN sequencing.
 

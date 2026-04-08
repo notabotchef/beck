@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 description = "Local skills router CLI for AI agents."
 license = "MIT OR Apache-2.0"
-repository = "https://gitlab.com/knifecode/beck"
+repository = "https://github.com/notabotchef/beck"
 readme = "README.md"
 
 [lib]
