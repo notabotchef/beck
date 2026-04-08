@@ -5,6 +5,7 @@ pub mod consts;
 pub mod db;
 pub mod error;
 pub mod frontmatter;
+pub mod mcp;
 pub mod paths;
 pub mod query;
 pub mod sync;
