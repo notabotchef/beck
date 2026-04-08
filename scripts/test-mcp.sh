@@ -69,6 +69,9 @@ check() {
 
 check "initialize response has serverInfo.name=beck"           '"name":"beck"'
 check "initialize response has protocolVersion"                '"protocolVersion"'
+# regression check for the bug Esteban caught in Claude Code + Claude Desktop:
+# strict MCP clients refuse to register tools unless capabilities.tools is set.
+check "initialize response advertises tools capability"        '"tools":{}'
 check "tools/list returns skills_query tool"                   '"skills_query"'
 check "tools/list returns skills_load tool"                    '"skills_load"'
 check "skills_query result contains whisper match"             'whisper'
