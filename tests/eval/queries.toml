@@ -1,0 +1,259 @@
+# beck Phase 0 accuracy test set.
+# 50 queries against tests/fixtures/skills/. Every expected_top1 MUST match
+# a real fixture directory name. Categories: exact, paraphrase, adversarial.
+
+# -------- 20 exact-keyword queries --------
+
+[[queries]]
+text = "apple reminders list todos"
+expected_top1 = "apple-reminders"
+category = "exact"
+
+[[queries]]
+text = "apple notes create note"
+expected_top1 = "apple-notes"
+category = "exact"
+
+[[queries]]
+text = "find my iphone airtag"
+expected_top1 = "findmy"
+category = "exact"
+
+[[queries]]
+text = "imessage sms terminal"
+expected_top1 = "imessage"
+category = "exact"
+
+[[queries]]
+text = "arxiv academic papers"
+expected_top1 = "arxiv"
+category = "exact"
+
+[[queries]]
+text = "blogwatcher rss feed monitor"
+expected_top1 = "blogwatcher"
+category = "exact"
+
+[[queries]]
+text = "linear issues graphql"
+expected_top1 = "linear"
+category = "exact"
+
+[[queries]]
+text = "notion pages database api"
+expected_top1 = "notion"
+category = "exact"
+
+[[queries]]
+text = "excalidraw hand drawn diagram"
+expected_top1 = "excalidraw"
+category = "exact"
+
+[[queries]]
+text = "stable diffusion text to image"
+expected_top1 = "stable-diffusion-image-generation"
+category = "exact"
+
+[[queries]]
+text = "whisper speech recognition transcription"
+expected_top1 = "whisper"
+category = "exact"
+
+[[queries]]
+text = "polymarket prediction market prices"
+expected_top1 = "polymarket"
+category = "exact"
+
+[[queries]]
+text = "github pull request workflow"
+expected_top1 = "github-pr-workflow"
+category = "exact"
+
+[[queries]]
+text = "openhue philips hue lights"
+expected_top1 = "openhue"
+category = "exact"
+
+[[queries]]
+text = "obsidian vault notes"
+expected_top1 = "obsidian"
+category = "exact"
+
+[[queries]]
+text = "xitter x twitter post tweet"
+expected_top1 = "xitter"
+category = "exact"
+
+[[queries]]
+text = "nano pdf edit typo"
+expected_top1 = "nano-pdf"
+category = "exact"
+
+[[queries]]
+text = "gif tenor search reaction"
+expected_top1 = "gif-search"
+category = "exact"
+
+[[queries]]
+text = "modal serverless gpu cloud"
+expected_top1 = "modal-serverless-gpu"
+category = "exact"
+
+[[queries]]
+text = "pyfiglet ascii art font"
+expected_top1 = "ascii-art"
+category = "exact"
+
+# -------- 20 paraphrase queries --------
+
+[[queries]]
+text = "search research papers by title and author"
+expected_top1 = "arxiv"
+category = "paraphrase"
+
+[[queries]]
+text = "turn bedroom lights on and change color"
+expected_top1 = "openhue"
+category = "paraphrase"
+
+[[queries]]
+text = "schedule a todo on my iphone"
+expected_top1 = "apple-reminders"
+category = "paraphrase"
+
+[[queries]]
+text = "transcribe an audio recording into text"
+expected_top1 = "whisper"
+category = "paraphrase"
+
+[[queries]]
+text = "generate an image from a text prompt"
+expected_top1 = "stable-diffusion-image-generation"
+category = "paraphrase"
+
+[[queries]]
+text = "restaurants and cafes close to me"
+expected_top1 = "find-nearby"
+category = "paraphrase"
+
+[[queries]]
+text = "read github pull request diff and leave inline comments"
+expected_top1 = "github-code-review"
+category = "paraphrase"
+
+[[queries]]
+text = "extract text from a scanned pdf document"
+expected_top1 = "ocr-and-documents"
+category = "paraphrase"
+
+[[queries]]
+text = "clone or create a new github repository"
+expected_top1 = "github-repo-management"
+category = "paraphrase"
+
+[[queries]]
+text = "track machine learning experiments and hyperparameters"
+expected_top1 = "weights-and-biases"
+category = "paraphrase"
+
+[[queries]]
+text = "run a language model locally on apple silicon"
+expected_top1 = "llama-cpp"
+category = "paraphrase"
+
+[[queries]]
+text = "serve a large language model with high throughput"
+expected_top1 = "serving-llms-vllm"
+category = "paraphrase"
+
+[[queries]]
+text = "quantize a model to run on cpu without gpu"
+expected_top1 = "gguf-quantization"
+category = "paraphrase"
+
+[[queries]]
+text = "send email from the command line with imap"
+expected_top1 = "himalaya"
+category = "paraphrase"
+
+[[queries]]
+text = "generate a full song with lyrics and tags"
+expected_top1 = "heartmula"
+category = "paraphrase"
+
+[[queries]]
+text = "create a slide deck pptx presentation"
+expected_top1 = "powerpoint"
+category = "paraphrase"
+
+[[queries]]
+text = "diagnose docker compose service startup problems"
+expected_top1 = "docker-compose-troubleshooting"
+category = "paraphrase"
+
+[[queries]]
+text = "download and manage huggingface models and datasets"
+expected_top1 = "huggingface-hub"
+category = "paraphrase"
+
+[[queries]]
+text = "segment objects in an image with prompts"
+expected_top1 = "segment-anything-model"
+category = "paraphrase"
+
+[[queries]]
+text = "browser automation to post threads with chrome session"
+expected_top1 = "threads-poster"
+category = "paraphrase"
+
+# -------- 10 adversarial queries --------
+
+[[queries]]
+text = "reminder"
+expected_top1 = "apple-reminders"
+category = "adversarial"
+
+[[queries]]
+text = "notes"
+expected_top1 = "apple-notes"
+category = "adversarial"
+
+[[queries]]
+text = "find airtag location"
+expected_top1 = "findmy"
+category = "adversarial"
+
+[[queries]]
+text = "diagram of system architecture hand sketched"
+expected_top1 = "excalidraw"
+category = "adversarial"
+
+[[queries]]
+text = "voice to text transcribe"
+expected_top1 = "whisper"
+category = "adversarial"
+
+[[queries]]
+text = "rss feed watcher new articles"
+expected_top1 = "blogwatcher"
+category = "adversarial"
+
+[[queries]]
+text = "pr code review"
+expected_top1 = "github-code-review"
+category = "adversarial"
+
+[[queries]]
+text = "fine tune llm with lora and qlora limited gpu"
+expected_top1 = "peft-fine-tuning"
+category = "adversarial"
+
+[[queries]]
+text = "text to image model diffusers"
+expected_top1 = "stable-diffusion-image-generation"
+category = "adversarial"
+
+[[queries]]
+text = "hue smart bulb control"
+expected_top1 = "openhue"
+category = "adversarial"

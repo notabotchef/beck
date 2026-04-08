@@ -1,11 +1,15 @@
-[package]
-name = "beck"
-version = "0.0.1"
+[workspace]
+members = ["crates/beck-core"]
+resolver = "2"
+
+[workspace.package]
 edition = "2021"
-description = "Local skills router CLI for AI agents."
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Nunezchef/beck"
-readme = "README.md"
 
-[lib]
-path = "src/lib.rs"
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
