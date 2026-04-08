@@ -9,7 +9,7 @@ pub mod tools;
 
 use rmcp::ServiceExt;
 use rmcp::handler::server::ServerHandler;
-use rmcp::model::{Implementation, ServerInfo};
+use rmcp::model::{Implementation, ServerCapabilities, ServerInfo};
 use rmcp::tool_handler;
 
 use crate::consts::APP_NAME;
@@ -21,12 +21,18 @@ impl ServerHandler for BeckServer {
     fn get_info(&self) -> ServerInfo {
         let mut info = ServerInfo::default();
         info.server_info = Implementation::new(APP_NAME, env!("CARGO_PKG_VERSION"));
+        // CRITICAL: strict MCP clients (Claude Code, Claude Desktop) refuse to
+        // register a server's tools unless it explicitly advertises the tools
+        // capability in the initialize response. Leaving this at the default
+        // empty capabilities silently breaks tool discovery for those clients
+        // (Codex is lenient and calls tools/list anyway).
+        info.capabilities = ServerCapabilities::builder().enable_tools().build();
         info.instructions = Some(
-            "beck is a local skills router. Use `skills_query` to search indexed \
-             SKILL.md files by free-text description, then `skills_load` to fetch \
-             the full body of the chosen skill. beck is populated by running \
-             `beck sync` from the shell, which walks ~/.hermes/skills and \
-             ~/.claude/skills by default."
+            "beck is a local skills router. Use `skills_query` to search \
+             indexed SKILL.md files by free-text description, then \
+             `skills_load` to fetch the full body of the chosen skill. beck \
+             is populated by running `beck sync` from the shell, which walks \
+             ~/.hermes/skills and ~/.claude/skills by default."
                 .into(),
         );
         info
