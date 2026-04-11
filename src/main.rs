@@ -116,6 +116,19 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
+
+    /// Diagnose beck installs: detect agents, foreign files, orphans, collisions.
+    Check {
+        /// Scan disk and overwrite the manifest from what beck finds.
+        #[arg(long)]
+        rebuild_manifest: bool,
+        /// Drop manifest entries whose target file is gone.
+        #[arg(long)]
+        prune: bool,
+        /// Emit JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[tokio::main]
@@ -143,6 +156,11 @@ async fn main() {
             all,
             json,
         } => commands::unlink::handle(skill, agent, all, json).await,
+        Command::Check {
+            rebuild_manifest,
+            prune,
+            json,
+        } => commands::check::handle(rebuild_manifest, prune, json).await,
     };
 
     if let Err(err) = result {

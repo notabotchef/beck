@@ -10,11 +10,11 @@
 //! methods to the trait without bumping the spec, because every new
 //! adapter will inherit them.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::agents::manifest::{Entry, InstallMode};
 use crate::agents::skill::Skill;
-use crate::error::Result;
+use crate::error::{CliError, Result};
 
 /// The plan an adapter produces for a single skill, before it touches
 /// disk. Phase 4 (`beck link`) prints the plan in `--dry-run` mode.
@@ -74,6 +74,25 @@ pub trait Adapter: Send + Sync {
     /// is still beck-managed before touching it (no clobbering
     /// user-authored files).
     fn uninstall(&self, entry: &Entry) -> Result<()>;
+
+    /// Phase 5 hook: walk `target_root()` and return every file that is
+    /// currently beck-managed, keyed by absolute path. "beck-managed"
+    /// means "installed by beck through this adapter": for Claude Code
+    /// that is any symlink whose target canonicalizes under
+    /// `<beck_home>/skills/`. The walk is shallow by design; adapters
+    /// decide their own depth.
+    fn list_managed(&self) -> Result<Vec<PathBuf>> {
+        Ok(Vec::new())
+    }
+
+    /// Phase 5 hook: rebuild a `Manifest::Entry` for a target path by
+    /// re-reading the file from disk. Used by `beck check
+    /// --rebuild-manifest` to recover a lost manifest.
+    fn rebuild_entry(&self, _target: &Path) -> Result<Entry> {
+        Err(CliError::Validation(
+            "rebuild_entry not implemented for this adapter".into(),
+        ))
+    }
 
     /// Phase 6 hook: walk the agent's native skills dir and return any
     /// skills that are NOT already symlinks back into `~/beck/skills/`.

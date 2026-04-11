@@ -26,6 +26,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::agents::adapter::{Adapter, InstallPlan};
 use crate::agents::manifest::{Entry, InstallMode};
+use crate::agents::paths::beck_home;
 use crate::agents::skill::Skill;
 use crate::error::{CliError, Result};
 
@@ -185,24 +186,13 @@ impl Adapter for ClaudeCodeAdapter {
             )));
         }
 
-        // Verify the symlink points at the same source the manifest
-        // recorded. If someone has retargeted it, bail.
-        let current = fs::read_link(&entry.target).map_err(|e| {
-            CliError::Validation(format!(
-                "failed to read symlink at {}: {e}",
-                entry.target.display()
-            ))
-        })?;
-
-        // `entry.target` in the manifest is absolute; the recorded source
-        // is not stored on the entry (the manifest tracks sha256, not the
-        // source path). So we only verify that the link is a symlink at
-        // all and that its destination actually exists. If a user
-        // manually repointed the link to their own file, `current` will
-        // not contain the `beck/skills` segment, and we refuse.
-        if !link_points_into_beck(&current) {
+        // Verify the link points somewhere inside our beck skills home.
+        // If someone manually repointed it, bail. Phase 5 swapped the
+        // string-component heuristic for an actual path-prefix check
+        // against `beck_home()?/skills`.
+        if !link_points_into_beck_home(&entry.target)? {
             return Err(CliError::Validation(format!(
-                "refusing to remove symlink at {} (no longer points into beck/skills)",
+                "refusing to remove symlink at {}: no longer points into beck skills home",
                 entry.target.display()
             )));
         }
@@ -222,6 +212,95 @@ impl Adapter for ClaudeCodeAdapter {
 
         Ok(())
     }
+
+    fn list_managed(&self) -> Result<Vec<PathBuf>> {
+        let root = match self.target_root() {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
+        if !root.exists() {
+            return Ok(Vec::new());
+        }
+
+        let skills_root = beck_home()?.join("skills");
+        let mut out = Vec::new();
+
+        // Walk `<target_root>/<skill_name>/SKILL.md` one level deep.
+        for entry in fs::read_dir(&root)? {
+            let entry = entry?;
+            if !entry.file_type()?.is_dir() {
+                continue;
+            }
+            let candidate = entry.path().join(SKILL_FILE_NAME);
+            let Ok(meta) = fs::symlink_metadata(&candidate) else {
+                continue;
+            };
+            if !meta.file_type().is_symlink() {
+                continue;
+            }
+            if link_resolves_under(&candidate, &skills_root) {
+                out.push(candidate);
+            }
+        }
+
+        out.sort();
+        Ok(out)
+    }
+
+    fn rebuild_entry(&self, target: &Path) -> Result<Entry> {
+        let meta = fs::symlink_metadata(target).map_err(|e| {
+            CliError::Validation(format!(
+                "cannot stat {}: {e}",
+                target.display()
+            ))
+        })?;
+        if !meta.file_type().is_symlink() {
+            return Err(CliError::Validation(format!(
+                "cannot rebuild entry, {} is not a symlink",
+                target.display()
+            )));
+        }
+        let source = fs::read_link(target).map_err(|e| {
+            CliError::Validation(format!(
+                "cannot read symlink {}: {e}",
+                target.display()
+            ))
+        })?;
+        build_entry(&source, target)
+    }
+}
+
+/// Does `link_path`, when its immediate symlink target is resolved,
+/// live somewhere under `beck_skills_root`? This is the accurate
+/// replacement for the old `link_points_into_beck` string heuristic.
+/// Both sides are canonicalized, which handles `/var` vs `/private/var`
+/// on macOS tempdirs.
+fn link_resolves_under(link_path: &Path, beck_skills_root: &Path) -> bool {
+    let Ok(target) = fs::read_link(link_path) else {
+        return false;
+    };
+    let resolved = if target.is_absolute() {
+        target
+    } else {
+        match link_path.parent() {
+            Some(parent) => parent.join(&target),
+            None => return false,
+        }
+    };
+    let Ok(canon_target) = fs::canonicalize(&resolved) else {
+        return false;
+    };
+    let Ok(canon_root) = fs::canonicalize(beck_skills_root) else {
+        return false;
+    };
+    canon_target.starts_with(&canon_root)
+}
+
+/// Standalone version used by `uninstall`: canonicalizes the link
+/// target and checks containment under `beck_home()?/skills`.
+fn link_points_into_beck_home(link_path: &Path) -> Result<bool> {
+    let skills_root = beck_home()?.join("skills");
+    Ok(link_resolves_under(link_path, &skills_root))
 }
 
 /// Build a manifest `Entry` for a freshly installed (or already
@@ -254,24 +333,6 @@ fn build_entry(source: &Path, target: &Path) -> Result<Entry> {
         sha256: sha256_hex(&bytes),
         installed_at: rfc3339_now(),
     })
-}
-
-fn link_points_into_beck(link_target: &Path) -> bool {
-    // Accept any path that contains `beck/skills` as a component
-    // sequence. This tolerates custom `$BECK_HOME` values, including
-    // tempdirs used by the integration tests.
-    let mut prev: Option<&std::ffi::OsStr> = None;
-    for component in link_target.components() {
-        let os = component.as_os_str();
-        if let Some(p) = prev
-            && p == "beck"
-            && os == "skills"
-        {
-            return true;
-        }
-        prev = Some(os);
-    }
-    false
 }
 
 fn sha256_hex(bytes: &[u8]) -> String {
@@ -677,16 +738,89 @@ mod tests {
     }
 
     #[test]
-    fn link_points_into_beck_recognizes_tempdir_layouts() {
-        assert!(link_points_into_beck(&PathBuf::from(
-            "/tmp/whatever/beck/skills/caveman/SKILL.md"
-        )));
-        assert!(link_points_into_beck(&PathBuf::from(
-            "/Users/x/beck/skills/y/SKILL.md"
-        )));
-        assert!(!link_points_into_beck(&PathBuf::from(
-            "/Users/x/.claude/skills/foo/SKILL.md"
-        )));
-        assert!(!link_points_into_beck(&PathBuf::from("/etc/passwd")));
+    fn link_resolves_under_accepts_symlink_into_beck_home() {
+        let _lock = ENV_LOCK.lock().unwrap();
+        let root = tempdir("link-resolves-ok");
+        let skills_root = root.join("beck").join("skills");
+        let source_dir = skills_root.join("caveman");
+        fs::create_dir_all(&source_dir).unwrap();
+        let source = source_dir.join("SKILL.md");
+        fs::write(&source, b"body").unwrap();
+
+        let link_parent = root.join("other");
+        fs::create_dir_all(&link_parent).unwrap();
+        let link = link_parent.join("SKILL.md");
+        std::os::unix::fs::symlink(&source, &link).unwrap();
+
+        assert!(link_resolves_under(&link, &skills_root));
+    }
+
+    #[test]
+    fn link_resolves_under_rejects_unrelated_target() {
+        let _lock = ENV_LOCK.lock().unwrap();
+        let root = tempdir("link-resolves-no");
+        let skills_root = root.join("beck").join("skills");
+        fs::create_dir_all(&skills_root).unwrap();
+
+        let other = root.join("unrelated.md");
+        fs::write(&other, b"unrelated").unwrap();
+
+        let link_parent = root.join("other");
+        fs::create_dir_all(&link_parent).unwrap();
+        let link = link_parent.join("SKILL.md");
+        std::os::unix::fs::symlink(&other, &link).unwrap();
+
+        assert!(!link_resolves_under(&link, &skills_root));
+    }
+
+    #[test]
+    fn list_managed_returns_symlinks_that_resolve_into_beck() {
+        let _lock = ENV_LOCK.lock().unwrap();
+        let root = tempdir("list-managed");
+        let (home, _source, skill) = fake_world(&root, "caveman");
+        // Override BECK_HOME too so beck_home()?.join("skills") lines
+        // up with the fake layout under the fake HOME.
+        let previous_beck = std::env::var_os("BECK_HOME");
+        unsafe {
+            std::env::set_var("BECK_HOME", home.join("beck"));
+        }
+        let _guard = HomeGuard::set(&home);
+
+        let adapter = ClaudeCodeAdapter;
+        let plan = adapter.plan(&skill).unwrap();
+        adapter.install(&plan).unwrap();
+
+        let managed = adapter.list_managed().unwrap();
+        assert_eq!(managed.len(), 1, "managed={managed:?}");
+        assert_eq!(managed[0], plan.target);
+
+        // Restore BECK_HOME.
+        unsafe {
+            match previous_beck {
+                Some(v) => std::env::set_var("BECK_HOME", v),
+                None => std::env::remove_var("BECK_HOME"),
+            }
+        }
+    }
+
+    #[test]
+    fn rebuild_entry_from_disk_produces_matching_sha() {
+        let _lock = ENV_LOCK.lock().unwrap();
+        let root = tempdir("rebuild-entry");
+        let (home, source, skill) = fake_world(&root, "caveman");
+        let _guard = HomeGuard::set(&home);
+
+        let adapter = ClaudeCodeAdapter;
+        let plan = adapter.plan(&skill).unwrap();
+        let original = adapter.install(&plan).unwrap();
+
+        let rebuilt = adapter.rebuild_entry(&plan.target).unwrap();
+        assert_eq!(rebuilt.skill, original.skill);
+        assert_eq!(rebuilt.agent, original.agent);
+        assert_eq!(rebuilt.target, original.target);
+        assert_eq!(rebuilt.sha256, original.sha256);
+
+        // Source is still there, target is still a symlink pointing at it.
+        assert!(source.exists());
     }
 }
