@@ -1,4 +1,5 @@
 pub mod bench;
+pub mod bootstrap;
 pub mod list;
 pub mod load;
 pub mod mcp;

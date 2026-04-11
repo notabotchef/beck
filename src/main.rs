@@ -78,6 +78,12 @@ enum Command {
 
     /// Start the MCP server on stdio.
     Mcp,
+
+    /// Initialize the beck home directory (`~/beck/skills/` + manifest).
+    Bootstrap {
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[tokio::main]
@@ -92,6 +98,7 @@ async fn main() {
         Command::Prompt { json } => commands::prompt::handle(json).await,
         Command::Bench { explain, json } => commands::bench::handle(explain, json).await,
         Command::Mcp => commands::mcp::handle().await,
+        Command::Bootstrap { json } => commands::bootstrap::handle(json).await,
     };
 
     if let Err(err) = result {
