@@ -268,6 +268,60 @@ impl Adapter for ClaudeCodeAdapter {
         })?;
         build_entry(&source, target)
     }
+
+    fn ingest(&self) -> Result<Vec<Skill>> {
+        let root = match self.target_root() {
+            Ok(r) => r,
+            Err(_) => return Ok(Vec::new()),
+        };
+        if !root.exists() {
+            return Ok(Vec::new());
+        }
+
+        // Skills that are already symlinks back into beck were created
+        // BY beck. Ingest walks the other direction: it pulls in skills
+        // a user hand-wrote under `~/.claude/skills/`. So we skip any
+        // entry whose SKILL.md is a symlink resolving under
+        // `beck_home()?/skills/`.
+        let beck_skills_root = beck_home().ok().map(|h| h.join("skills"));
+
+        let mut out = Vec::new();
+        for entry in fs::read_dir(&root)? {
+            let entry = entry?;
+            let ft = entry.file_type()?;
+            if !ft.is_dir() {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().to_string();
+            let candidate = entry.path().join(SKILL_FILE_NAME);
+
+            // Only consider actual SKILL.md files. If it is a symlink
+            // into beck already, skip: that skill already lives in the
+            // canonical home.
+            let Ok(meta) = fs::symlink_metadata(&candidate) else {
+                continue;
+            };
+            if meta.file_type().is_symlink()
+                && let Some(ref beck_root) = beck_skills_root
+                && link_resolves_under(&candidate, beck_root)
+            {
+                continue;
+            }
+
+            // Load the skill. `from_path` uses the parent dir as the
+            // skill name, which is what we want for Claude Code's
+            // `<name>/SKILL.md` layout.
+            if let Ok(mut skill) = Skill::from_path(&candidate) {
+                // Override the name to the directory under target_root,
+                // in case the file is nested deeper.
+                skill.name = name;
+                out.push(skill);
+            }
+        }
+
+        out.sort_by(|a, b| a.name.cmp(&b.name));
+        Ok(out)
+    }
 }
 
 /// Does `link_path`, when its immediate symlink target is resolved,
@@ -801,6 +855,65 @@ mod tests {
                 None => std::env::remove_var("BECK_HOME"),
             }
         }
+    }
+
+    #[test]
+    fn ingest_returns_handwritten_skills_and_skips_beck_symlinks() {
+        let _lock = ENV_LOCK.lock().unwrap();
+        let root = tempdir("ingest");
+        let home = root.join("home");
+        fs::create_dir_all(home.join(".claude").join("skills")).unwrap();
+
+        // Canonical beck home for the link-skip case.
+        let beck = home.join("beck");
+        fs::create_dir_all(beck.join("skills").join("compress")).unwrap();
+        let beck_source = beck.join("skills").join("compress").join("SKILL.md");
+        fs::write(&beck_source, "---\nname: compress\n---\nbody\n").unwrap();
+
+        // Hand-written skill directly under ~/.claude/skills (not a
+        // symlink): ingest SHOULD pick this up.
+        let handwritten_dir = home.join(".claude").join("skills").join("handwritten");
+        fs::create_dir_all(&handwritten_dir).unwrap();
+        fs::write(
+            handwritten_dir.join("SKILL.md"),
+            "---\nname: handwritten\ndescription: user authored\n---\nuser body\n",
+        )
+        .unwrap();
+
+        // Symlink from ~/.claude/skills/compress/SKILL.md → beck source.
+        // ingest SHOULD skip this: it is already beck-managed.
+        let claude_compress_dir = home.join(".claude").join("skills").join("compress");
+        fs::create_dir_all(&claude_compress_dir).unwrap();
+        std::os::unix::fs::symlink(
+            &beck_source,
+            claude_compress_dir.join("SKILL.md"),
+        )
+        .unwrap();
+
+        // Override BECK_HOME so the ingest-side `link_resolves_under`
+        // check sees our fake beck root.
+        let previous_beck = std::env::var_os("BECK_HOME");
+        unsafe {
+            std::env::set_var("BECK_HOME", &beck);
+        }
+        let _home_guard = HomeGuard::set(&home);
+
+        let skills = ClaudeCodeAdapter.ingest().unwrap();
+
+        unsafe {
+            match previous_beck {
+                Some(v) => std::env::set_var("BECK_HOME", v),
+                None => std::env::remove_var("BECK_HOME"),
+            }
+        }
+
+        assert_eq!(
+            skills.len(),
+            1,
+            "expected only the handwritten skill, got {skills:?}"
+        );
+        assert_eq!(skills[0].name, "handwritten");
+        assert!(skills[0].body.contains("user body"));
     }
 
     #[test]

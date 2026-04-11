@@ -27,6 +27,8 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Walk configured roots, index every SKILL.md into the local database.
+    /// With `--from <agent>`, reverse-ingest skills from an agent's
+    /// native directory into `~/beck/skills/` (dry-run by default).
     Sync {
         /// Force a full rebuild even if nothing appears to have changed.
         #[arg(long)]
@@ -34,6 +36,12 @@ enum Command {
         /// Emit JSON instead of human text.
         #[arg(long)]
         json: bool,
+        /// Reverse-ingest from this agent into `~/beck/skills/`.
+        #[arg(long)]
+        from: Option<String>,
+        /// Execute the ingest plan. Without this, dry-run only.
+        #[arg(long)]
+        write: bool,
     },
 
     /// List every indexed skill.
@@ -136,7 +144,12 @@ async fn main() {
     let cli = Cli::parse();
 
     let result: Result<(), CliError> = match cli.command {
-        Command::Sync { force, json } => commands::sync::handle(force, json).await,
+        Command::Sync {
+            force,
+            json,
+            from,
+            write,
+        } => commands::sync::handle(force, json, from, write).await,
         Command::List { json } => commands::list::handle(json).await,
         Command::Query { text, top, json } => commands::query::handle(&text, top, json).await,
         Command::Load { name, json } => commands::load::handle(&name, json).await,
