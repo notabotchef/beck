@@ -67,15 +67,20 @@ brew install notabotchef/beck/beck                   # coming in v0.1.0
 curl -fsSL https://get.beck.dev | sh                 # coming in v0.1.0
 ```
 
-Right now only `cargo install beck` works, against the `0.0.1` name
-reservation. The Homebrew tap and the `curl | sh` installer land with the
-v0.1.0 release. The shipped binary is **2.0 MB stripped on Apple Silicon**,
-smaller than `fd` (~2.4 MB), smaller than `bat` (~3.5 MB), and a fraction of
-`ripgrep`.
+The Homebrew tap and the `curl | sh` installer land with the v0.1.0
+release. The shipped binary is **2.1 MB stripped on Apple Silicon** for
+v0.2, smaller than `fd` (~2.4 MB), smaller than `bat` (~3.5 MB), and a
+fraction of `ripgrep`.
 
 ## How to use it
 
-beck ships exactly seven commands. One line each.
+beck has two personalities: the **MCP router** (v0.1) and the **universal
+skills directory** (v0.2). The MCP router is the query-on-demand path that
+kills the token cost. The universal directory is the opposite direction: it
+is the single place you edit your skills, and beck installs them into every
+agent that speaks its own format.
+
+### v0.1 commands (MCP router)
 
 ```
 beck sync                index ~/.hermes/skills and ~/.claude/skills into the local db
@@ -91,6 +96,95 @@ beck mcp                 start the MCP server on stdio (for Claude Code, Claude 
 Hot `beck query` calls return in **4 ms**. Everything lives in a single
 SQLite file with an FTS5 index.
 
+### v0.2 commands (universal skills directory)
+
+v0.2 adds four commands. Write your skill once at
+`~/beck/skills/<name>/SKILL.md`, run `beck link`, and beck installs it into
+every agent you have (Claude Code today, more coming).
+
+```
+beck bootstrap           create ~/beck/skills/ and the manifest
+beck link [--agent N]    install every skill into every detected agent
+beck unlink --all        remove every beck-installed file (foreign files are safe)
+beck check [--json]      diagnose agents, orphans, foreign files, case collisions
+beck sync --from claude-code --write    reverse-ingest skills you already wrote into ~/beck/skills/
+```
+
+Quick start for v0.2:
+
+```bash
+$ beck bootstrap
+initialized beck home at /Users/you/beck
+  skills: /Users/you/beck/skills
+  manifest: /Users/you/beck/.beck-manifest.json
+
+$ mkdir -p ~/beck/skills/caveman && cat > ~/beck/skills/caveman/SKILL.md <<'EOF'
+---
+name: caveman
+description: ultra-compressed communication mode
+---
+
+# caveman
+
+Drop articles, drop pronouns, keep verbs. Speak as few words as possible.
+EOF
+
+$ beck link
+linked 1 targets:
+caveman
+  claude-code -> /Users/you/.claude/skills/caveman/SKILL.md
+
+$ beck check
+detected agents: claude-code
+manifest: ok
+beck-managed files: 1
+```
+
+One source of truth (`~/beck/skills/`), every agent gets a copy in its
+native format. `beck link` is idempotent: running it twice reports "skipped"
+because the source sha256 has not drifted. `beck unlink --all` only removes
+files beck installed and will never touch a file the user wrote by hand.
+
+### Supported agents in v0.2
+
+| Agent | Target on macOS / Linux | Install mode | Status |
+|-------|-------------------------|--------------|--------|
+| Claude Code | `~/.claude/skills/<name>/SKILL.md` | Symlink | shipping |
+| Cursor | per-project `.cursor/rules/` only | deferred (no user-global rules dir) | v0.3 candidate |
+| Windsurf | TBD | not researched | v0.3 candidate |
+| Cline | TBD | not researched | v0.3 candidate |
+
+Cursor dropped out of v0.2 because there is no user-global rules directory:
+every Cursor rule lives in a specific project. beck installs globally by
+design, so Cursor lands in v0.3 once we ship a per-project install mode or
+Cursor ships a global rules location. Track the decision in
+`.rune/plan-beck-link-spec.md` section 0.
+
+### Uninstalling cleanly
+
+`beck unlink --all` is the whole uninstall story on the agent side. It reads
+the manifest at `~/beck/.beck-manifest.json`, walks every entry, and removes
+the file beck installed. Files the user wrote by hand are never touched.
+Run `beck check` afterward to confirm the expected state.
+
+```bash
+$ beck unlink --all
+unlinked 1:
+  caveman/claude-code -> /Users/you/.claude/skills/caveman/SKILL.md
+
+$ beck check
+detected agents: claude-code
+manifest: ok
+beck-managed files: 0
+```
+
+To remove beck itself, delete the canonical source tree too:
+
+```bash
+rm -rf ~/beck
+cargo uninstall beck       # or: brew uninstall beck
+```
+
 ## Why you want this
 
 Three ways an agent can reach the same pile of skills. Token cost per turn:
@@ -100,6 +194,7 @@ Three ways an agent can reach the same pile of skills. Token cost per turn:
 | Inject everything (status quo)        | ~150,000            | 300 skills, average 500-token description   |
 | beck CLI path (shell out per query)   | ~15,000             | Agent still sees a stub frontmatter line per skill, ~50 tokens x 300 |
 | beck MCP path (tools only)            | **~200 (flat)**     | Two tool schemas. Flat for 5 skills or 5,000 |
+| beck universal install (v0.2)         | native agent cost   | `beck link` drops files into every agent's native dir; agent loads via its own mechanism |
 
 The CLI path is an honest improvement over the baseline, roughly 10x. The MCP
 path is the wedge. Two tools, two JSON schemas, done. beck exposes no
@@ -231,19 +326,20 @@ or `brew uninstall beck`) finishes the job.
 
 ## Roadmap
 
-**v0.1.0** (shipping soon). First real release. Homebrew tap. `curl | sh`
-installer. Release binaries for Linux (gnu + musl, x86_64 + aarch64) and
-macOS (Intel + Apple Silicon). Animated demo GIF in this README.
+**v0.1.0** (shipped). MCP router, `beck sync / list / query / load / prompt
+/ bench / mcp`, release binaries for Linux (gnu + musl, x86_64 + aarch64)
+and macOS (Intel + Apple Silicon), Homebrew tap.
 
-**v0.2.0**. `beck watch` (file watcher auto-sync via `notify`). `beck init`
-(interactive first-run setup). `beck doctor` (config + db inspection).
-`beck stub` (opt-in disk rewriter for non-MCP agents, with backup + restore).
-Possible opt-in embedding reranker behind `beck embed-enable`, gated on a
-second eval pass.
+**v0.2.0** (shipping now). Universal skills directory. `~/beck/skills/` as
+the single source of truth. New commands: `beck bootstrap`, `beck link`,
+`beck unlink`, `beck check`, and `beck sync --from <agent>` for reverse
+ingest. Claude Code is the one shipping adapter. Additive: every v0.1
+command still works exactly the same.
 
-**v0.3.0**. `beck-spec` companion repo that formalizes the SKILL.md
-frontmatter convention so other tools can adopt it. Non-skill doc indexing
-(CLAUDE.md, DESIGN_TOKENS.md, etc.) as a separate collection.
+**v0.3.0**. Cursor adapter (pending per-project install mode), Windsurf,
+Cline, OpenCode, and Continue adapters as demand-gated. `beck-spec`
+companion repo that formalizes the SKILL.md frontmatter convention so
+other tools can adopt it.
 
 **v1.0.0**. Homebrew-core merged. Schema frozen. Semver guarantee. Windows
 support lands around here if the Mac + Linux story is solid.
