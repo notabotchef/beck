@@ -84,6 +84,38 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
+
+    /// Install every skill under `~/beck/skills/` into every detected agent.
+    Link {
+        /// Only install into this agent (e.g. `claude-code`).
+        #[arg(long)]
+        agent: Option<String>,
+        /// Print the plan without touching disk.
+        #[arg(long)]
+        dry_run: bool,
+        /// Re-install a beck-managed target whose source sha256 has drifted.
+        #[arg(long)]
+        force: bool,
+        /// Emit JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Remove beck-managed installs from one or more agents.
+    Unlink {
+        /// Only remove entries for this skill.
+        #[arg(long)]
+        skill: Option<String>,
+        /// Only remove entries for this agent.
+        #[arg(long)]
+        agent: Option<String>,
+        /// Remove every entry in the manifest.
+        #[arg(long)]
+        all: bool,
+        /// Emit JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[tokio::main]
@@ -99,6 +131,18 @@ async fn main() {
         Command::Bench { explain, json } => commands::bench::handle(explain, json).await,
         Command::Mcp => commands::mcp::handle().await,
         Command::Bootstrap { json } => commands::bootstrap::handle(json).await,
+        Command::Link {
+            agent,
+            dry_run,
+            force,
+            json,
+        } => commands::link::handle(agent, dry_run, force, json).await,
+        Command::Unlink {
+            skill,
+            agent,
+            all,
+            json,
+        } => commands::unlink::handle(skill, agent, all, json).await,
     };
 
     if let Err(err) = result {
