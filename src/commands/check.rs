@@ -212,9 +212,10 @@ pub fn run_check(
         }
         let rebuilt = rebuild_manifest_from_disk(&adapters)?;
         rebuilt.save(manifest_file)?;
-        report
-            .mutations
-            .push(format!("rebuilt manifest with {} entries", rebuilt.entries.len()));
+        report.mutations.push(format!(
+            "rebuilt manifest with {} entries",
+            rebuilt.entries.len()
+        ));
         manifest = rebuilt;
     }
 
@@ -257,11 +258,7 @@ fn parse_version_from_error(msg: &str) -> Option<u32> {
     None
 }
 
-fn walk_foreign(
-    target_root: &Path,
-    managed: &[PathBuf],
-    agent: &str,
-) -> Vec<ForeignFile> {
+fn walk_foreign(target_root: &Path, managed: &[PathBuf], agent: &str) -> Vec<ForeignFile> {
     let mut out = Vec::new();
     let managed_set: std::collections::HashSet<&PathBuf> = managed.iter().collect();
 
@@ -559,7 +556,10 @@ mod tests {
 
         assert_eq!(report.beck_managed, 1);
         assert_eq!(report.foreign.len(), 1);
-        assert_eq!(report.foreign[0].path, target_root.join("beta").join("SKILL.md"));
+        assert_eq!(
+            report.foreign[0].path,
+            target_root.join("beta").join("SKILL.md")
+        );
         assert_eq!(report.foreign[0].agent, "mock");
     }
 
@@ -751,7 +751,10 @@ mod tests {
         .unwrap();
 
         assert!(
-            report.mutations.iter().any(|m| m.contains("rebuilt manifest with 2")),
+            report
+                .mutations
+                .iter()
+                .any(|m| m.contains("rebuilt manifest with 2")),
             "mutations={:?}",
             report.mutations
         );

@@ -154,15 +154,15 @@ body goes here\n";
             skill.frontmatter.description.as_deref(),
             Some("ultra compressed communication")
         );
-        assert_eq!(
-            skill.frontmatter.tags.as_ref().map(|v| v.len()),
-            Some(2)
-        );
+        assert_eq!(skill.frontmatter.tags.as_ref().map(|v| v.len()), Some(2));
         assert!(skill.body.contains("body goes here"));
         // sha256 is 64 hex chars, all lowercase.
         assert_eq!(skill.sha256.len(), 64);
         assert!(
-            skill.sha256.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
+            skill
+                .sha256
+                .chars()
+                .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
         );
     }
 
@@ -236,7 +236,10 @@ body goes here\n";
     fn sha256_hex_is_lowercase_and_64_chars() {
         let out = sha256_hex(b"hello");
         assert_eq!(out.len(), 64);
-        assert!(out.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()));
+        assert!(
+            out.chars()
+                .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
+        );
         // Known vector: sha256("hello") =
         // 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
         assert_eq!(

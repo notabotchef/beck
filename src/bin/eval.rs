@@ -55,13 +55,15 @@ fn main() -> Result<()> {
     let mut top1_hits = 0usize;
     let mut top3_hits = 0usize;
     let mut misses: Vec<(String, String, Vec<String>)> = Vec::new();
-    let mut by_cat: std::collections::BTreeMap<String, (usize, usize, usize)> =
-        Default::default();
+    let mut by_cat: std::collections::BTreeMap<String, (usize, usize, usize)> = Default::default();
 
     for q in &qs.queries {
         let results = search(&db, &q.text, 3)?;
         let names: Vec<String> = results.iter().map(|m| m.name.clone()).collect();
-        let t1 = names.first().map(|n| n == &q.expected_top1).unwrap_or(false);
+        let t1 = names
+            .first()
+            .map(|n| n == &q.expected_top1)
+            .unwrap_or(false);
         let t3 = names.iter().any(|n| n == &q.expected_top1);
         if t1 {
             top1_hits += 1;
@@ -87,8 +89,18 @@ fn main() -> Result<()> {
 
     println!();
     println!("=== Phase 0 eval results ===");
-    println!("top-1 recall: {}/{} = {:.1}%", top1_hits, qs.queries.len(), top1);
-    println!("top-3 recall: {}/{} = {:.1}%", top3_hits, qs.queries.len(), top3);
+    println!(
+        "top-1 recall: {}/{} = {:.1}%",
+        top1_hits,
+        qs.queries.len(),
+        top1
+    );
+    println!(
+        "top-3 recall: {}/{} = {:.1}%",
+        top3_hits,
+        qs.queries.len(),
+        top3
+    );
     println!();
     println!("by category:");
     for (cat, (n, t1, t3)) in &by_cat {

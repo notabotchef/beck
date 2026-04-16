@@ -32,9 +32,8 @@ pub fn beck_home() -> Result<PathBuf> {
         return Ok(path);
     }
 
-    let home = dirs::home_dir().ok_or_else(|| {
-        CliError::Validation("could not resolve home dir (HOME not set)".into())
-    })?;
+    let home = dirs::home_dir()
+        .ok_or_else(|| CliError::Validation("could not resolve home dir (HOME not set)".into()))?;
     Ok(home.join(HOME_SUBDIR))
 }
 

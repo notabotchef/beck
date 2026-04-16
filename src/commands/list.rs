@@ -15,9 +15,7 @@ pub async fn handle(json_out: bool) -> Result<()> {
     let mut stmt = db
         .conn
         .prepare("SELECT name, description FROM skills ORDER BY name")?;
-    let rows = stmt.query_map([], |r| {
-        Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
-    })?;
+    let rows = stmt.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?;
     let mut items: Vec<(String, String)> = Vec::new();
     for row in rows {
         items.push(row?);

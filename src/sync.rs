@@ -38,11 +38,7 @@ pub fn sync_root(db: &Db, root: &Path) -> Result<usize> {
             continue;
         }
         let description = fm.description.clone().unwrap_or_default();
-        let tags = fm
-            .tags
-            .clone()
-            .map(|v| v.join(" "))
-            .unwrap_or_default();
+        let tags = fm.tags.clone().map(|v| v.join(" ")).unwrap_or_default();
         let path_str = path.to_string_lossy().to_string();
 
         // Last-wins on duplicate name: remove prior row with same name, insert fresh.

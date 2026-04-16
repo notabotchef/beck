@@ -48,8 +48,14 @@ fn bootstrap_creates_skills_dir_and_manifest_then_idempotent() {
     let skills_dir = home.join("skills");
     let manifest_file = home.join(".beck-manifest.json");
 
-    assert!(skills_dir.is_dir(), "skills home should exist at {skills_dir:?}");
-    assert!(manifest_file.is_file(), "manifest should exist at {manifest_file:?}");
+    assert!(
+        skills_dir.is_dir(),
+        "skills home should exist at {skills_dir:?}"
+    );
+    assert!(
+        manifest_file.is_file(),
+        "manifest should exist at {manifest_file:?}"
+    );
 
     // Manifest is valid JSON with schema_version: 1, entries: [].
     let loaded = Manifest::load(&manifest_file).expect("manifest should load");

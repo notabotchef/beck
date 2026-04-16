@@ -32,8 +32,5 @@ pub fn default_roots() -> Vec<PathBuf> {
         home.join(".hermes").join("skills"),
         home.join(".claude").join("skills"),
     ];
-    candidates
-        .into_iter()
-        .filter(|p| p.exists())
-        .collect()
+    candidates.into_iter().filter(|p| p.exists()).collect()
 }

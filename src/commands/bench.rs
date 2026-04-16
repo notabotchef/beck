@@ -63,14 +63,22 @@ pub async fn handle(explain: bool, json_out: bool) -> Result<()> {
         println!();
         println!("--- math ---");
         println!("chars_per_token            = {CHARS_PER_TOKEN}");
-        println!("per_skill_format_overhead  = {PER_SKILL_FORMAT_OVERHEAD}  (bytes of '- {{name}}: ' framing)");
+        println!(
+            "per_skill_format_overhead  = {PER_SKILL_FORMAT_OVERHEAD}  (bytes of '- {{name}}: ' framing)"
+        );
         println!("description_bytes          = {desc_bytes}");
-        println!("body_bytes                 = {body_bytes}  (not counted, beck only replaces the catalog metadata)");
+        println!(
+            "body_bytes                 = {body_bytes}  (not counted, beck only replaces the catalog metadata)"
+        );
         println!(
             "baseline_bytes             = description_bytes + (skill_count * per_skill_format_overhead)"
         );
-        println!("                           = {desc_bytes} + ({count} * {PER_SKILL_FORMAT_OVERHEAD}) = {baseline_bytes}");
-        println!("baseline_tokens            = baseline_bytes / chars_per_token = {baseline_tokens}");
+        println!(
+            "                           = {desc_bytes} + ({count} * {PER_SKILL_FORMAT_OVERHEAD}) = {baseline_bytes}"
+        );
+        println!(
+            "baseline_tokens            = baseline_bytes / chars_per_token = {baseline_tokens}"
+        );
         println!("beck_session_tokens        = 200  (2 MCP tools * ~100 tokens each, flat)");
         println!("tokens_saved_per_turn      = baseline_tokens - beck_session_tokens = {saved}");
     }

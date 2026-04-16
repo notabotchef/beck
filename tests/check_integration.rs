@@ -80,7 +80,10 @@ fn check_classifies_beck_managed_foreign_and_orphan_then_prunes() {
     let out = run(&beck_home, &fake_home, &["link", "--agent", "claude-code"]);
     assert_ok("link", &out);
     let linked_target = claude_skills.join("caveman").join("SKILL.md");
-    assert!(linked_target.exists(), "link should create {linked_target:?}");
+    assert!(
+        linked_target.exists(),
+        "link should create {linked_target:?}"
+    );
 
     // Foreign file: user-authored SKILL.md at a different subdir of
     // the claude skills root. beck did not install it and will not

@@ -21,11 +21,13 @@ pub async fn handle(text: &str, top: usize, json_out: bool) -> Result<()> {
     if json_out {
         let arr = matches
             .iter()
-            .map(|m| json!({
-                "name": m.name,
-                "description": m.description,
-                "score": m.score,
-            }))
+            .map(|m| {
+                json!({
+                    "name": m.name,
+                    "description": m.description,
+                    "score": m.score,
+                })
+            })
             .collect::<Vec<_>>();
         println!("{}", serde_json::to_string_pretty(&arr).unwrap_or_default());
     } else if matches.is_empty() {

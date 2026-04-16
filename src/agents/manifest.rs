@@ -87,9 +87,7 @@ impl Manifest {
     pub fn load(path: &Path) -> Result<Self> {
         let bytes = fs::read(path)?;
         let manifest: Manifest = serde_json::from_slice(&bytes).map_err(|_| {
-            CliError::Validation(
-                "manifest corrupt, run beck check --rebuild-manifest".into(),
-            )
+            CliError::Validation("manifest corrupt, run beck check --rebuild-manifest".into())
         })?;
 
         if manifest.schema_version != SCHEMA_VERSION {
@@ -124,9 +122,8 @@ impl Manifest {
                 .truncate(true)
                 .open(&tmp_path)?;
 
-            let json = serde_json::to_vec_pretty(self).map_err(|e| {
-                CliError::Validation(format!("failed to serialize manifest: {e}"))
-            })?;
+            let json = serde_json::to_vec_pretty(self)
+                .map_err(|e| CliError::Validation(format!("failed to serialize manifest: {e}")))?;
             file.write_all(&json)?;
             file.write_all(b"\n")?;
             file.sync_all()?;

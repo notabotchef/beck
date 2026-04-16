@@ -143,8 +143,8 @@ enum Command {
 async fn main() {
     // Show banner on bare `beck` or `beck --help` (TTY only).
     let raw_args: Vec<String> = std::env::args().collect();
-    let is_help_or_bare = raw_args.len() == 1
-        || raw_args.iter().any(|a| a == "--help" || a == "-h");
+    let is_help_or_bare =
+        raw_args.len() == 1 || raw_args.iter().any(|a| a == "--help" || a == "-h");
     if is_help_or_bare {
         banner::maybe_print();
     }

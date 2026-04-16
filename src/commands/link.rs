@@ -67,12 +67,7 @@ pub struct FailedItem {
 
 /// Top-level entry point called from `main.rs`. Builds the adapter set
 /// from the shipping registry and runs the link workflow.
-pub async fn handle(
-    agent: Option<String>,
-    dry_run: bool,
-    force: bool,
-    json: bool,
-) -> Result<()> {
+pub async fn handle(agent: Option<String>, dry_run: bool, force: bool, json: bool) -> Result<()> {
     let adapters = registry::all_adapters();
     let skills_root = skills_home()?;
     let manifest_file = manifest_path()?;
@@ -324,9 +319,7 @@ fn rollback_skill(
     // Scrub the report of any `linked` entries for this skill that were
     // added before the rollback. A rolled-back install must not show up
     // as linked in the final summary.
-    report
-        .linked
-        .retain(|item| item.skill != skill_name);
+    report.linked.retain(|item| item.skill != skill_name);
     Ok(())
 }
 
@@ -341,11 +334,7 @@ fn filter_adapters<'a>(
     all: &'a [&'a dyn Adapter],
     selector: Option<&str>,
 ) -> Result<Vec<&'a dyn Adapter>> {
-    let detected: Vec<&dyn Adapter> = all
-        .iter()
-        .filter(|a| a.detect())
-        .copied()
-        .collect();
+    let detected: Vec<&dyn Adapter> = all.iter().filter(|a| a.detect()).copied().collect();
 
     match selector {
         None => Ok(detected),
@@ -376,7 +365,11 @@ fn print_human_report(report: &LinkReport) {
     }
 
     if !report.linked.is_empty() {
-        let header = if report.dry_run { "would link" } else { "linked" };
+        let header = if report.dry_run {
+            "would link"
+        } else {
+            "linked"
+        };
         println!("{header} {} targets:", report.linked.len());
         for (skill, lines) in &by_skill {
             println!("{skill}");

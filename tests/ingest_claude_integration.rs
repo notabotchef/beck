@@ -84,15 +84,26 @@ fn reverse_ingest_from_claude_code_dry_run_then_write() {
     );
     assert_ok("sync --from claude-code (dry-run)", &dry);
     let body = String::from_utf8_lossy(&dry.stdout);
-    let report: serde_json::Value =
-        serde_json::from_str(&body).expect("valid json on dry-run");
+    let report: serde_json::Value = serde_json::from_str(&body).expect("valid json on dry-run");
     assert_eq!(report["agent"], "claude-code");
     assert_eq!(report["written"], false);
     assert_eq!(report["created"].as_u64().unwrap(), 2);
 
     // Nothing should have been created on disk yet.
-    assert!(!beck_home.join("skills").join("alpha").join("SKILL.md").exists());
-    assert!(!beck_home.join("skills").join("beta").join("SKILL.md").exists());
+    assert!(
+        !beck_home
+            .join("skills")
+            .join("alpha")
+            .join("SKILL.md")
+            .exists()
+    );
+    assert!(
+        !beck_home
+            .join("skills")
+            .join("beta")
+            .join("SKILL.md")
+            .exists()
+    );
 
     // Real write.
     let written = run(

@@ -243,7 +243,10 @@ mod tests {
         fn target_root(&self) -> Result<PathBuf> {
             Ok(PathBuf::from("/tmp/mock"))
         }
-        fn plan(&self, _skill: &beck::agents::skill::Skill) -> Result<beck::agents::adapter::InstallPlan> {
+        fn plan(
+            &self,
+            _skill: &beck::agents::skill::Skill,
+        ) -> Result<beck::agents::adapter::InstallPlan> {
             unreachable!("plan not used in unlink tests")
         }
         fn install(&self, _plan: &beck::agents::adapter::InstallPlan) -> Result<Entry> {
@@ -356,8 +359,7 @@ mod tests {
     #[test]
     fn failing_uninstall_surfaces_in_report() {
         let beck = tempdir("unlink-fail");
-        let manifest_file =
-            write_manifest(&beck, vec![sample_entry("alpha", "claude-code")]);
+        let manifest_file = write_manifest(&beck, vec![sample_entry("alpha", "claude-code")]);
 
         let adapter = TrackingAdapter {
             name: "claude-code",

@@ -28,12 +28,7 @@ use beck::error::{CliError, Result};
 use beck::paths;
 use beck::sync as core_sync;
 
-pub async fn handle(
-    _force: bool,
-    json_out: bool,
-    from: Option<String>,
-    write: bool,
-) -> Result<()> {
+pub async fn handle(_force: bool, json_out: bool, from: Option<String>, write: bool) -> Result<()> {
     if let Some(agent) = from {
         return handle_ingest(&agent, write, json_out).await;
     }
@@ -234,22 +229,15 @@ fn classify(skill: &Skill, target: &Path) -> Result<IngestPlan> {
 
 fn atomic_write(target: &Path, source: &Path) -> Result<()> {
     let bytes = fs::read(source).map_err(|e| {
-        CliError::Validation(format!(
-            "failed to read source {}: {e}",
-            source.display()
-        ))
+        CliError::Validation(format!("failed to read source {}: {e}", source.display()))
     })?;
     let tmp = {
         let mut os = target.as_os_str().to_os_string();
         os.push(".tmp");
         PathBuf::from(os)
     };
-    fs::write(&tmp, &bytes).map_err(|e| {
-        CliError::Validation(format!(
-            "write to tmp {} failed: {e}",
-            tmp.display()
-        ))
-    })?;
+    fs::write(&tmp, &bytes)
+        .map_err(|e| CliError::Validation(format!("write to tmp {} failed: {e}", tmp.display())))?;
     fs::rename(&tmp, target).map_err(|e| {
         CliError::Validation(format!(
             "rename {} -> {} failed: {e}",
@@ -261,11 +249,7 @@ fn atomic_write(target: &Path, source: &Path) -> Result<()> {
 }
 
 fn print_ingest_report(report: &IngestReport) {
-    println!(
-        "agent: {}, dry_run: {}",
-        report.agent,
-        !report.written
-    );
+    println!("agent: {}, dry_run: {}", report.agent, !report.written);
     println!(
         "  created: {}, skipped: {}, conflicts: {}",
         report.created, report.skipped, report.conflicts
@@ -452,10 +436,7 @@ mod tests {
         assert_eq!(report.conflicts, 1);
         assert_eq!(report.created, 0);
         // File on disk is unchanged.
-        assert_eq!(
-            fs::read_to_string(&target).unwrap(),
-            "pre-existing body\n"
-        );
+        assert_eq!(fs::read_to_string(&target).unwrap(), "pre-existing body\n");
     }
 
     #[test]

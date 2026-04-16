@@ -94,10 +94,7 @@ impl Adapter for ClaudeCodeAdapter {
         // Make sure the parent dir exists before we touch the leaf.
         if let Some(parent) = plan.target.parent() {
             fs::create_dir_all(parent).map_err(|e| {
-                CliError::Validation(format!(
-                    "mkdir -p {} failed: {e}",
-                    parent.display()
-                ))
+                CliError::Validation(format!("mkdir -p {} failed: {e}", parent.display()))
             })?;
         }
 
@@ -248,12 +245,8 @@ impl Adapter for ClaudeCodeAdapter {
     }
 
     fn rebuild_entry(&self, target: &Path) -> Result<Entry> {
-        let meta = fs::symlink_metadata(target).map_err(|e| {
-            CliError::Validation(format!(
-                "cannot stat {}: {e}",
-                target.display()
-            ))
-        })?;
+        let meta = fs::symlink_metadata(target)
+            .map_err(|e| CliError::Validation(format!("cannot stat {}: {e}", target.display())))?;
         if !meta.file_type().is_symlink() {
             return Err(CliError::Validation(format!(
                 "cannot rebuild entry, {} is not a symlink",
@@ -261,10 +254,7 @@ impl Adapter for ClaudeCodeAdapter {
             )));
         }
         let source = fs::read_link(target).map_err(|e| {
-            CliError::Validation(format!(
-                "cannot read symlink {}: {e}",
-                target.display()
-            ))
+            CliError::Validation(format!("cannot read symlink {}: {e}", target.display()))
         })?;
         build_entry(&source, target)
     }
@@ -422,9 +412,7 @@ fn format_rfc3339(unix_secs: i64) -> String {
     let second = secs_in_day % 60;
 
     let (year, month, day) = civil_from_days(days);
-    format!(
-        "{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}Z"
-    )
+    format!("{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}Z")
 }
 
 /// Civil-from-days (Hinnant). Returns `(year, month, day)` for a given
@@ -780,15 +768,9 @@ mod tests {
         // 0 → 1970-01-01T00:00:00Z
         assert_eq!(format_rfc3339(0), "1970-01-01T00:00:00Z");
         // 1_700_000_000 → 2023-11-14T22:13:20Z
-        assert_eq!(
-            format_rfc3339(1_700_000_000),
-            "2023-11-14T22:13:20Z"
-        );
+        assert_eq!(format_rfc3339(1_700_000_000), "2023-11-14T22:13:20Z");
         // 1_800_000_000 → 2027-01-15T08:00:00Z
-        assert_eq!(
-            format_rfc3339(1_800_000_000),
-            "2027-01-15T08:00:00Z"
-        );
+        assert_eq!(format_rfc3339(1_800_000_000), "2027-01-15T08:00:00Z");
     }
 
     #[test]
@@ -884,11 +866,7 @@ mod tests {
         // ingest SHOULD skip this: it is already beck-managed.
         let claude_compress_dir = home.join(".claude").join("skills").join("compress");
         fs::create_dir_all(&claude_compress_dir).unwrap();
-        std::os::unix::fs::symlink(
-            &beck_source,
-            claude_compress_dir.join("SKILL.md"),
-        )
-        .unwrap();
+        std::os::unix::fs::symlink(&beck_source, claude_compress_dir.join("SKILL.md")).unwrap();
 
         // Override BECK_HOME so the ingest-side `link_resolves_under`
         // check sees our fake beck root.

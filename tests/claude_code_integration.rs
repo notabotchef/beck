@@ -90,10 +90,7 @@ fn install_then_read_through_symlink_then_uninstall() {
     assert!(adapter.detect(), "detect() should see the .claude dir");
 
     let plan = adapter.plan(skill).expect("plan");
-    let expected_target = claude
-        .join("skills")
-        .join("caveman")
-        .join("SKILL.md");
+    let expected_target = claude.join("skills").join("caveman").join("SKILL.md");
     assert_eq!(plan.target, expected_target);
     assert_eq!(plan.mode, InstallMode::Symlink);
     assert!(plan.transform.is_none());
