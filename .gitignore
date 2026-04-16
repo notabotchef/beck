@@ -4,3 +4,4 @@ Cargo.lock.bak
 .rune/
 .claude/
 *.swp
+.env
