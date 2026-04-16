@@ -20,8 +20,8 @@ beck replaces that eager-load pattern with query-on-demand. The agent calls
 `skills_query` when it wants a skill, gets back three BM25-ranked names, then
 calls `skills_load` on the one it actually needs. MCP session-start cost is
 **a flat ~200 tokens regardless of how many skills you have**. On my machine,
-with 153 unique skills indexed, `beck bench` reports **~10,833 tokens saved
-per agent turn, 98% of the baseline**.
+with 547 skills indexed, `beck bench` reports **~21,000 tokens saved per agent
+turn, 99% of the baseline**.
 
 Zero network calls. Zero telemetry. Zero daemons. One 2.0 MB binary.
 
@@ -62,15 +62,13 @@ library. An animated screencast will land here before the v0.1.0 tag.
 ## Install
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/notabotchef/beck/main/scripts/install.sh | sh
 cargo install beck                                   # from source via crates.io
-brew install notabotchef/beck/beck                   # coming in v0.1.0
-curl -fsSL https://get.beck.dev | sh                 # coming in v0.1.0
+brew install notabotchef/beck/beck                   # coming soon
 ```
 
-The Homebrew tap and the `curl | sh` installer land with the v0.1.0
-release. The shipped binary is **2.1 MB stripped on Apple Silicon** for
-v0.2, smaller than `fd` (~2.4 MB), smaller than `bat` (~3.5 MB), and a
-fraction of `ripgrep`.
+The shipped binary is **2.0 MB stripped on Apple Silicon**, smaller than `fd`
+(~2.4 MB), smaller than `bat` (~3.5 MB), and a fraction of `ripgrep`.
 
 ## How to use it
 
