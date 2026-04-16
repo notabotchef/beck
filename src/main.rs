@@ -8,7 +8,7 @@
 use clap::{Parser, Subcommand};
 
 use beck::error::{CliError, print_error_json};
-
+mod banner;
 mod commands;
 
 #[derive(Parser, Debug)]
@@ -141,6 +141,14 @@ enum Command {
 
 #[tokio::main]
 async fn main() {
+    // Show banner on bare `beck` or `beck --help` (TTY only).
+    let raw_args: Vec<String> = std::env::args().collect();
+    let is_help_or_bare = raw_args.len() == 1
+        || raw_args.iter().any(|a| a == "--help" || a == "-h");
+    if is_help_or_bare {
+        banner::maybe_print();
+    }
+
     let cli = Cli::parse();
 
     let result: Result<(), CliError> = match cli.command {
