@@ -1,0 +1,20 @@
+{
+  "title": "beck — local skills router for AI agents",
+  "meta_description": "Stop burning tokens on skills your agent ignores. beck indexes SKILL.md files and serves them on demand via MCP. 200 flat tokens. 2MB binary. Zero network calls.",
+  "og_title": "beck — your agent's skills, at its beck and call",
+  "og_description": "Local skills router for AI agents. 200 flat tokens per session instead of 100,000. Single static Rust binary. MCP server included.",
+  "og_image": "/marketing/og-image.png",
+  "canonical": "https://github.com/notabotchef/beck",
+  "keywords": [
+    "MCP server",
+    "AI agent skills",
+    "token optimization",
+    "Claude Code skills",
+    "SKILL.md router",
+    "agent tool search",
+    "Rust CLI tool",
+    "local MCP",
+    "AI agent tools",
+    "system prompt optimization"
+  ]
+}
