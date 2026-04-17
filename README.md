@@ -6,42 +6,14 @@
 [![build](https://img.shields.io/github/actions/workflow/status/notabotchef/beck/ci.yml?branch=main)](https://github.com/notabotchef/beck/actions)
 [![license](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
-```
- ┌─● ● ●──────────────────┐
- │ █   █ ████  ███  █   █ │
- │ ██ ██ █    █   █ █ █ █ │
- │ █ █ █ ███  █   █ █ █ █ │
- │ █   █ █    █   █ █ █ █ │
- │ █   █ ████  ███   █ █  │
- └─────────────────────────┘
-  your agent's skills, at its beck and call.
-```
+<p align="center">
+  <img src="assets/hero.png" alt="beck — your agent's skills, at its beck and call." width="720">
+</p>
 
 Your agent loads every skill into its system prompt on every turn.
 500+ skills = 21,000 tokens before you say a word.
 
 beck indexes your skills and serves them on demand. 200 flat tokens.
-
-```
-$ beck sync
-indexed 547 skills into ~/Library/Application Support/beck/skills.db
-  293  ~/.hermes/skills
-  254  ~/.claude/skills
-
-$ beck bench
-beck saves you ~21066 tokens per agent turn (99% of the baseline)
-  skills indexed:              326
-  baseline inject-all tokens:  21266
-  beck MCP session tokens:     200  (flat)
-
-$ beck query "transcribe audio"
-whisper
-  OpenAI's general-purpose speech recognition model. Supports 99 languages...
-audiocraft-audio-generation
-  PyTorch library for audio generation including text-to-music (MusicGen)...
-songsee
-  Generate spectrograms and audio feature visualizations (mel, chroma, MFCC...
-```
 
 ## Install
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 640px;
+    height: 260px;
+    background: transparent;
+  }
+  .window {
+    width: 620px;
+    margin: 20px auto 0;
+    background: #0d1117;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    overflow: hidden;
+    font-family: "SF Mono", "Menlo", "JetBrains Mono", "Cascadia Mono", "Consolas", monospace;
+  }
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .dot-red   { background: #ff5f57; }
+  .dot-yellow{ background: #ffbd2e; }
+  .dot-green { background: #28c840; }
+  .body {
+    padding: 18px 20px 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre;
+    color: #6e7681;
+  }
+  .tagline {
+    color: #e6edf3;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar">
+    <div class="dot dot-red"></div>
+    <div class="dot dot-yellow"></div>
+    <div class="dot dot-green"></div>
+  </div>
+  <div class="body"> ┌─● ● ●──────────────────┐
+ │ █   █ ████  ███  █   █ │
+ │ ██ ██ █    █   █ █ █ █ │
+ │ █ █ █ ███  █   █ █ █ █ │
+ │ █   █ █    █   █ █ █ █ │
+ │ █   █ ████  ███   █ █  │
+ └─────────────────────────┘
+ <span class="tagline"> your agent's skills, at its beck and call.</span></div>
+</div>
+</body>
+</html>
