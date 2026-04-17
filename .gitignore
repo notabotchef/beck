@@ -5,3 +5,11 @@ Cargo.lock.bak
 .claude/
 *.swp
 .env
+
+# Internal planning docs (not for public repo)
+CLAUDE.md
+CONTEXT.md
+HANDOFF.md
+STATUS.md
+TODOS.md
+docs/agents/

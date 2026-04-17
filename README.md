@@ -15,11 +15,36 @@
 ```
 
 Your agent loads every skill into its system prompt on every turn.
-500 skills = 21,000 tokens before you say a word.
+500+ skills = 21,000 tokens before you say a word.
 
 beck indexes your skills and serves them on demand. 200 flat tokens.
 
+```
+$ beck sync
+indexed 547 skills into ~/Library/Application Support/beck/skills.db
+  293  ~/.hermes/skills
+  254  ~/.claude/skills
+
+$ beck bench
+beck saves you ~21066 tokens per agent turn (99% of the baseline)
+  skills indexed:              326
+  baseline inject-all tokens:  21266
+  beck MCP session tokens:     200  (flat)
+
+$ beck query "transcribe audio"
+whisper
+  OpenAI's general-purpose speech recognition model. Supports 99 languages...
+audiocraft-audio-generation
+  PyTorch library for audio generation including text-to-music (MusicGen)...
+songsee
+  Generate spectrograms and audio feature visualizations (mel, chroma, MFCC...
+```
+
 ## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/notabotchef/beck/main/scripts/install.sh | sh
+```
 
 ```bash
 cargo install beck
@@ -28,9 +53,9 @@ cargo install beck
 ## Quick start
 
 ```bash
-beck sync                                        # index your skills
-beck query "transcribe audio"                    # search (BM25, 4ms)
-beck load whisper                                # load the match
+beck sync                      # index your skills
+beck query "transcribe audio"  # search (BM25, 4ms)
+beck load whisper              # load the match
 ```
 
 ## MCP (Claude Code, Desktop, Cursor)
@@ -48,16 +73,21 @@ Two MCP tools: `skills_query` and `skills_load`. Session cost: ~200 tokens.
 | Inject everything | ~150,000 (300 skills) |
 | **beck MCP** | **~200 (flat)** |
 
-98% top-3 retrieval recall. Pure FTS5 BM25. No embeddings. Eval harness in `tests/eval/`.
+98% top-3 retrieval recall. Pure FTS5 BM25. No embeddings.
+Eval harness in `tests/eval/`. Run `cargo test --features eval --bin eval`.
 
-## What it does
+## Commands
 
-- **`beck sync`** — indexes SKILL.md files from `~/.hermes/skills` and `~/.claude/skills`
-- **`beck query`** — BM25-ranked search across name, description, tags, body
-- **`beck load`** — prints the full skill body
-- **`beck mcp`** — MCP server over stdio
-- **`beck link`** — write skills once, install into every agent
-- **`beck bench`** — see your real token savings
+| Command | What it does |
+|---------|-------------|
+| `beck sync` | Index SKILL.md files from `~/.hermes/skills` and `~/.claude/skills` |
+| `beck query "<text>"` | BM25-ranked search across name, description, tags, body |
+| `beck load <name>` | Print the full skill body |
+| `beck mcp` | MCP server over stdio |
+| `beck link` | Write skills once, install into every agent |
+| `beck check` | Diagnose agents, orphans, collisions |
+| `beck bench` | See your real token savings |
+| `beck prompt` | Print the agent integration stub |
 
 2.0 MB binary. Zero network calls. Zero telemetry. macOS + Linux.
 

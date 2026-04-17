@@ -16,7 +16,6 @@ const BANNER: &str = r#"
 /// Print the banner to stderr if stdout is a TTY (not piped).
 pub fn maybe_print() {
     if std::io::stdout().is_terminal() {
-        // dim the banner body, leave tagline at default
         let lines: Vec<&str> = BANNER.lines().collect();
         for (i, line) in lines.iter().enumerate() {
             if line.trim().is_empty() {
