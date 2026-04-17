@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 <p align="center">
-  <img src="assets/hero.png" alt="beck — your agent's skills, at its beck and call." width="720">
+  <img src="https://raw.githubusercontent.com/notabotchef/beck/main/assets/hero.png" alt="beck — your agent's skills, at its beck and call." width="720">
 </p>
 
 Your agent loads every skill into its system prompt on every turn.
