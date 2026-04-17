@@ -7,11 +7,13 @@
 [![license](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 ```
- ____                 
-| __ )  ___  ___ _ __ ___
-|  _ \ / _ \/ _ \ '_ ` _ \
-| |_) |  __/  __/ | | | | |
-|____/ \___|\___|_| |_| |_|
+ ┏━━━━━━━━━━━━━━━━━━━━━━━┓
+ ┃ █   █ ████  ███  █   █ ┃
+ ┃ ██ ██ █    █   █ █ █ █ ┃
+ ┃ █ █ █ ███  █   █ █ █ █ ┃
+ ┃ █   █ █    █   █ █ █ █ ┃
+ ┃ █   █ ████  ███   █ █  ┃
+ ┗━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 Your agent loads every skill into its system prompt on every turn.
