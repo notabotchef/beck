@@ -5,6 +5,29 @@ All notable changes to beck are listed here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and beck tries to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-04-17
+
+CLI cosmetics release. No behavior changes, no schema changes, no MCP
+changes. Output format now matches the README hero screenshot.
+
+### Changed
+
+- Banner: replaced the box-framed block art with the ANSI Shadow figlet
+  for "BECK". The fake terminal-window chrome is gone (it only lives in
+  the README PNG). TTY-gating is unchanged.
+- `beck query` (human output) prints one match per line, with names
+  padded to a shared column and the first description line truncated to
+  fit. The two-line indented format is gone.
+- `beck bench` (human output) now uses US thousand separators
+  (`21,266`), drops the redundant `skills indexed` line, condenses the
+  two remaining detail rows, and right-aligns the numbers. JSON payload
+  is unchanged.
+
+### Added
+
+- `LICENSE-MIT` and `LICENSE-APACHE` files. Cargo.toml has always
+  declared `MIT OR Apache-2.0`; the files were missing on disk.
+
 ## [0.2.0] - 2026-04-11 (beck-link)
 
 Additive release. Every v0.1 command and behavior is untouched.
