@@ -3,25 +3,29 @@
 
 use std::io::IsTerminal;
 
-const BANNER: &str = r#"
- ┌─● ● ●──────────────────┐
- │ █   █ ████  ███  █   █ │
- │ ██ ██ █    █   █ █ █ █ │
- │ █ █ █ ███  █   █ █ █ █ │
- │ █   █ █    █   █ █ █ █ │
- │ █   █ ████  ███   █ █  │
- └─────────────────────────┘
-  your agent's skills, at its beck and call.
-"#;
+// ANSI Shadow figlet for "BECK". Two lines (3 and 4) end with a single
+// trailing space that closes the box-drawing corner glyph; written via
+// "\x20" so editors that strip trailing whitespace cannot eat them.
+const BANNER: &str = concat!(
+    "\n",
+    "██████╗ ███████╗ ██████╗██╗  ██╗\n",
+    "██╔══██╗██╔════╝██╔════╝██║ ██╔╝\n",
+    "██████╔╝█████╗  ██║     █████╔╝\x20\n",
+    "██╔══██╗██╔══╝  ██║     ██╔═██╗\x20\n",
+    "██████╔╝███████╗╚██████╗██║  ██╗\n",
+    "╚═════╝ ╚══════╝ ╚═════╝╚═╝  ╚═╝\n",
+    "\n",
+    "your agent's skills, at its beck and call.\n",
+);
 
 /// Print the banner to stderr if stdout is a TTY (not piped).
 pub fn maybe_print() {
     if std::io::stdout().is_terminal() {
         let lines: Vec<&str> = BANNER.lines().collect();
         for (i, line) in lines.iter().enumerate() {
-            if line.trim().is_empty() {
+            if line.is_empty() {
                 eprintln!();
-            } else if i < lines.len() - 2 {
+            } else if i < lines.len() - 1 {
                 // ASCII art lines: dim gray
                 eprintln!("\x1b[2m{}\x1b[0m", line);
             } else {

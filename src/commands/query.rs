@@ -33,14 +33,19 @@ pub async fn handle(text: &str, top: usize, json_out: bool) -> Result<()> {
     } else if matches.is_empty() {
         println!("no matches");
     } else {
+        // Column-aligned: pad every name to the longest name + 3 spaces, then
+        // first description line truncated to ~60 chars to keep one-line rows
+        // readable in 80-column terminals.
+        let name_width = matches.iter().map(|m| m.name.len()).max().unwrap_or(0);
+        let desc_cap: usize = 60;
         for m in &matches {
             let first = m.description.lines().next().unwrap_or("").trim();
-            let short = if first.len() > 100 {
-                format!("{}...", &first[..97])
+            let short = if first.len() > desc_cap {
+                format!("{}...", &first[..desc_cap.saturating_sub(3)])
             } else {
                 first.to_string()
             };
-            println!("{}\n  {}", m.name, short);
+            println!("{:<width$}   {}", m.name, short, width = name_width);
         }
     }
     Ok(())

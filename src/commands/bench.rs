@@ -13,6 +13,22 @@ const CHARS_PER_TOKEN: f64 = 4.0;
 /// This is the "inject everything" baseline beck saves you from.
 const PER_SKILL_FORMAT_OVERHEAD: i64 = 30;
 
+/// Format a signed integer with US thousand separators. e.g. 21266 -> "21,266".
+fn commafy(n: i64) -> String {
+    let s = n.abs().to_string();
+    let mut out = String::new();
+    for (i, c) in s.chars().rev().enumerate() {
+        if i > 0 && i % 3 == 0 {
+            out.insert(0, ',');
+        }
+        out.insert(0, c);
+    }
+    if n < 0 {
+        out.insert(0, '-');
+    }
+    out
+}
+
 pub async fn handle(explain: bool, json_out: bool) -> Result<()> {
     let db_path = paths::db_path()?;
     if !db_path.exists() {
@@ -53,10 +69,12 @@ pub async fn handle(explain: bool, json_out: bool) -> Result<()> {
             serde_json::to_string_pretty(&payload).unwrap_or_default()
         );
     } else {
-        println!("beck saves you ~{saved} tokens per agent turn ({pct}% of the baseline)");
-        println!("  skills indexed:              {count}");
-        println!("  baseline inject-all tokens:  {baseline_tokens}");
-        println!("  beck MCP session tokens:     {beck_session_tokens}  (flat)");
+        let saved_h = commafy(saved);
+        let baseline_h = commafy(baseline_tokens);
+        let beck_h = commafy(beck_session_tokens);
+        println!("beck saves you ~{saved_h} tokens per agent turn ({pct}% of baseline)");
+        println!("  baseline inject-all:   {baseline_h:>6} tokens");
+        println!("  beck MCP session:      {beck_h:>6} tokens (flat)");
     }
 
     if explain {
