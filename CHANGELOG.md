@@ -5,6 +5,19 @@ All notable changes to beck are listed here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and beck tries to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-04-17
+
+Hotfix: `cargo install beck` (without `--locked`) failed to compile on
+0.2.1. `rmcp` 1.3.0 declares a loose `rmcp-macros` version range, so
+fresh installs resolved `rmcp-macros` 1.5.0, where the `tool_router`
+macro generates a private associated function and the `tool_handler`
+macro can no longer call it. Pinned both `rmcp` and `rmcp-macros` to
+`=1.3.0` so the default install path works again.
+
+### Fixed
+
+- `cargo install beck` no longer requires `--locked`.
+
 ## [0.2.1] - 2026-04-17
 
 CLI cosmetics release. No behavior changes, no schema changes, no MCP

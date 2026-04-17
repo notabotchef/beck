@@ -1,6 +1,6 @@
 [package]
 name = "beck"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 rust-version = "1.85"
 description = "Local skills router CLI for AI agents. Your agent's skills, at its beck and call."
@@ -23,7 +23,12 @@ required-features = ["eval"]
 anyhow = "1"
 clap = { version = "4.6", features = ["derive", "string"] }
 dirs = "6"
-rmcp = { version = "1.3", features = ["server"] }
+rmcp = { version = "=1.3.0", features = ["server"] }
+# Pin rmcp-macros to match rmcp 1.3.0. rmcp 1.3.0 declares a loose
+# rmcp-macros version range, and macros 1.4+ ships a breaking change
+# (tool_router becomes private), so cargo install without --locked
+# resolved rmcp-macros 1.5.0 and broke the build. See 0.2.1 incident.
+rmcp-macros = "=1.3.0"
 rusqlite = { version = "0.39", features = ["bundled"] }
 schemars = "1.2"
 serde = { version = "1", features = ["derive"] }
